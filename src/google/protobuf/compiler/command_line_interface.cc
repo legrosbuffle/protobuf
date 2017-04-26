@@ -812,13 +812,16 @@ int CommandLineInterface::Run(int argc, const char* const argv[]) {
     // Enforce --direct_dependencies
     if (direct_dependencies_explicitly_set_) {
       bool indirect_imports = false;
+      string real_name;
+      GOOGLE_CHECK(source_tree.VirtualFileToDiskFile(
+          parsed_file->dependency(i)->name(), &real_name));
       for (int i = 0; i < parsed_file->dependency_count(); i++) {
-        if (direct_dependencies_.find(parsed_file->dependency(i)->name()) ==
+        if (direct_dependencies_.find(real_name) ==
             direct_dependencies_.end()) {
           indirect_imports = true;
           cerr << parsed_file->name() << ": "
                << StringReplace(direct_dependencies_violation_msg_, "%s",
-                                parsed_file->dependency(i)->name(),
+                                real_name,
                                 true /* replace_all */)
                << std::endl;
         }
